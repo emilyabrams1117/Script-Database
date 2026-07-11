@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Play {
+  id          String  @id @default(cuid())
+  title       String
+  titleNorm   String
+  author      String
+  authorLast  String?
+  type        String? // PDF | Print | Print + PDF
+  publication String?
+
+  driveFileId String?
+  linkSource  String? // studio_scripts | links | manual
+
+  castSize      Int?
+  maleCount     Int?
+  femaleCount   Int?
+  flexibleCount Int?
+  genre         String?
+  runtime       String?
+  synopsis      String?
+  extractedText String? // full PDF text, used for keyword search
+  metadataBackfilled Boolean @default(false)
+
+  read     Boolean @default(false)
+  seen     Boolean @default(false)
+  favorite Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([titleNorm])
+  @@index([authorLast])
+  @@index([genre])
+}
+
+model AllowedUser {
+  id      String   @id @default(cuid())
+  email   String   @unique
+  isAdmin Boolean  @default(false)
+  addedAt DateTime @default(now())
+}
