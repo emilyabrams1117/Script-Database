@@ -22,6 +22,28 @@ def normalize_title(title: str) -> str:
     return t
 
 
+def candidate_titles(name: str):
+    """Try the several filename conventions seen across Emily's Drive folders."""
+    candidates = []
+
+    # "Last, First - Title (notes)" or "Last, First - Title - notes"
+    m = re.match(r"^[^,]+,\s*[^-]+-\s*(.+)$", name)
+    if m:
+        rest = m.group(1)
+        rest = re.split(r"\s+-\s+", rest)[0]
+        rest = re.split(r"\(", rest)[0]
+        candidates.append(rest.strip())
+
+    # "Title by Author [extra]"
+    parts = re.split(r"\s+by\s+", name, maxsplit=1, flags=re.IGNORECASE)
+    candidates.append(re.split(r"\(", parts[0])[0].strip())
+
+    # whole filename, minus any trailing parenthetical note
+    candidates.append(re.split(r"\(", name)[0].strip())
+
+    return [c for c in candidates if c]
+
+
 def main(plays_path, drive_files_path, out_path):
     with open(plays_path, encoding="utf-8") as f:
         plays = json.load(f)
@@ -33,12 +55,8 @@ def main(plays_path, drive_files_path, out_path):
     by_title = defaultdict(list)
     for f in pdfs:
         name = re.sub(r"\.pdf$", "", f["name"], flags=re.IGNORECASE)
-        # "{Title} by {Author}[ extra]" pattern, else whole filename as title
-        parts = re.split(r"\s+by\s+", name, maxsplit=1, flags=re.IGNORECASE)
-        title = parts[0].strip()
-        by_title[normalize_title(title)].append(f)
-        # also index the raw filename (minus extension) in case there's no " by "
-        by_title[normalize_title(name)].append(f)
+        for title in candidate_titles(name):
+            by_title[normalize_title(title)].append(f)
 
     stats = {"live_matched": 0, "kept_old_match": 0, "still_unmatched": 0}
 
