@@ -9,7 +9,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { PrismaClient } from "../app/generated/prisma/client";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 type SourcePlay = {
   title: string;
@@ -19,9 +19,10 @@ type SourcePlay = {
 };
 
 async function main() {
-  const adapter = new PrismaBetterSqlite3({
-    url: process.env.DATABASE_URL ?? "file:./dev.db",
-  });
+  if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is not set. Add your Neon connection string to .env");
+  }
+  const adapter = new PrismaPg(process.env.DATABASE_URL);
   const prisma = new PrismaClient({ adapter });
 
   const dataPath = path.join(__dirname, "..", "..", "data", "plays.json");
