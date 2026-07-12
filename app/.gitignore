@@ -46,3 +46,8 @@ next-env.d.ts
 *.db
 *.db-journal
 
+# secrets — never commit or ship these
+credentials/
+*.pem
+
+

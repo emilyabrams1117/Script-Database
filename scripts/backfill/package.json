@@ -1,0 +1,8 @@
+{
+  "name": "backfill",
+  "private": true,
+  "type": "commonjs",
+  "dependencies": {
+    "google-auth-library": "^9"
+  }
+}

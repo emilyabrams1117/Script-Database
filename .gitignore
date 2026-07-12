@@ -1,0 +1,6 @@
+# backfill tooling: local deps + working outputs (may contain personal Drive file listings)
+scripts/backfill/node_modules/
+scripts/backfill/drive_files.json
+
+# intermediate/working datasets from the Drive re-matching process
+data/plays_v2.json
