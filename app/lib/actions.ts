@@ -62,6 +62,7 @@ export async function updatePlay(id: string, formData: FormData) {
       flexibleCount: int(formData, "flexibleCount"),
       driveFileId: driveLinkInput ? extractDriveFileId(driveLinkInput) : null,
       linkSource: driveLinkInput ? "manual" : null,
+      metadataBackfilled: true,
     },
   });
 
