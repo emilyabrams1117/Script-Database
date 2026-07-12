@@ -11,6 +11,7 @@ export type PlaySearchParams = {
   read?: string;
   seen?: string;
   favorite?: string;
+  missingLink?: string;
   minMale?: string;
   minFemale?: string;
   sort?: string;
@@ -37,6 +38,7 @@ export function buildWhere(params: PlaySearchParams): Prisma.PlayWhereInput {
   if (params.read === "1") and.push({ read: true });
   if (params.seen === "1") and.push({ seen: true });
   if (params.favorite === "1") and.push({ favorite: true });
+  if (params.missingLink === "1") and.push({ driveFileId: null });
   if (params.minMale) and.push({ maleCount: { gte: Number(params.minMale) } });
   if (params.minFemale) and.push({ femaleCount: { gte: Number(params.minFemale) } });
 

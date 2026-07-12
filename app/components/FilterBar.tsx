@@ -130,6 +130,15 @@ export function FilterBar({
           />
           Favorite
         </label>
+        <label className="flex items-center gap-1.5 text-sm">
+          <input
+            type="checkbox"
+            name="missingLink"
+            value="1"
+            defaultChecked={params.missingLink === "1"}
+          />
+          Missing PDF link
+        </label>
       </div>
 
       <div className="flex gap-2">

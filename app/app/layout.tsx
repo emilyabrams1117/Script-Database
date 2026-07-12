@@ -43,6 +43,12 @@ export default function RootLayout({
               >
                 Favorites
               </a>
+              <a
+                href="/plays/new"
+                className="hover:text-black dark:hover:text-white"
+              >
+                Add a play
+              </a>
             </nav>
           </div>
         </header>

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { toggleRead, toggleSeen, toggleFavorite } from "@/lib/actions";
@@ -56,7 +57,15 @@ export default async function PlayDetailPage({
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 grid gap-8 md:grid-cols-[1fr_1.2fr]">
       <div>
-        <h1 className="text-2xl font-semibold mb-1">{play.title}</h1>
+        <div className="flex items-start justify-between gap-2">
+          <h1 className="text-2xl font-semibold mb-1">{play.title}</h1>
+          <Link
+            href={`/plays/${play.id}/edit`}
+            className="text-xs shrink-0 rounded border border-black/15 dark:border-white/20 px-2 py-1 hover:bg-black/5 dark:hover:bg-white/10"
+          >
+            Edit
+          </Link>
+        </div>
         <p className="text-black/60 dark:text-white/60 mb-4">{play.author}</p>
 
         <div className="flex gap-2 mb-6">
