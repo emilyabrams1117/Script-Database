@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { updatePlay } from "@/lib/actions";
+import { updatePlay, deletePlay } from "@/lib/actions";
 import { PlayForm } from "@/components/PlayForm";
+import { DeleteButton } from "@/components/DeleteButton";
 
 export default async function EditPlayPage({
   params,
@@ -14,7 +15,13 @@ export default async function EditPlayPage({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <h1 className="text-2xl font-semibold mb-6">Edit &ldquo;{play.title}&rdquo;</h1>
+      <div className="flex items-start justify-between gap-4 mb-6">
+        <h1 className="text-2xl font-semibold">Edit &ldquo;{play.title}&rdquo;</h1>
+        <DeleteButton
+          action={deletePlay.bind(null, play.id)}
+          confirmMessage={`Delete "${play.title}"? This can't be undone.`}
+        />
+      </div>
       <PlayForm play={play} action={updatePlay.bind(null, play.id)} submitLabel="Save changes" />
     </div>
   );

@@ -101,3 +101,9 @@ export async function createPlay(formData: FormData) {
   revalidatePath("/plays");
   redirect(`/plays/${play.id}`);
 }
+
+export async function deletePlay(id: string) {
+  await prisma.play.delete({ where: { id } });
+  revalidatePath("/plays");
+  redirect("/plays");
+}
