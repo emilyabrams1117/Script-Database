@@ -46,6 +46,9 @@ export function PlayCard({ play }: { play: Play }) {
         {play.genre && <span>{play.genre}</span>}
         {play.castSize != null && <span>Cast: {play.castSize}</span>}
       </div>
+      {play.synopsis && (
+        <p className="text-sm text-black/70 dark:text-white/70 line-clamp-3">{play.synopsis}</p>
+      )}
       <div className="flex gap-2 mt-1">
         <Toggle label="Read" active={play.read} action={toggleRead.bind(null, play.id)} />
         <Toggle label="Seen" active={play.seen} action={toggleSeen.bind(null, play.id)} />
