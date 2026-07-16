@@ -5,7 +5,7 @@ import type { Play } from "@/app/generated/prisma/client";
 import type { PlaySearchParams } from "@/lib/queries";
 import { loadMorePlays } from "@/lib/actions";
 import { PlayCard } from "@/components/PlayCard";
-import { PlayListRow } from "@/components/PlayListRow";
+import { PlayListRow, PlayListHeader } from "@/components/PlayListRow";
 import { FILTER_FORM_ID } from "@/lib/constants";
 
 function GridIcon() {
@@ -117,6 +117,7 @@ export function PlayResults({
         </div>
       ) : (
         <div className="flex flex-col">
+          <PlayListHeader />
           {plays.map((play) => (
             <PlayListRow key={play.id} play={play} />
           ))}
