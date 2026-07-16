@@ -1,5 +1,8 @@
 import type { Play } from "@/app/generated/prisma/client";
 
+const fieldClass =
+  "border border-black/15 dark:border-white/20 rounded-md px-2 py-1.5 bg-transparent text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent";
+
 function Field({
   label,
   name,
@@ -22,7 +25,7 @@ function Field({
         defaultValue={defaultValue ?? ""}
         placeholder={placeholder}
         min={type === "number" ? 0 : undefined}
-        className="border border-black/15 dark:border-white/20 rounded px-2 py-1.5 bg-transparent text-sm"
+        className={fieldClass}
       />
     </label>
   );
@@ -49,7 +52,10 @@ export function PlayForm({
       </div>
       <Field label="Publication" name="publication" defaultValue={play?.publication} />
       <Field label="Genre" name="genre" defaultValue={play?.genre} />
-      <Field label="Runtime" name="runtime" defaultValue={play?.runtime} placeholder="e.g. 90 minutes" />
+      <div className="grid grid-cols-2 gap-4">
+        <Field label="Runtime" name="runtime" defaultValue={play?.runtime} placeholder="e.g. 90 minutes" />
+        <Field label="Year" name="year" type="number" defaultValue={play?.year} placeholder="e.g. 1998" />
+      </div>
 
       <div className="grid grid-cols-3 gap-4">
         <Field label="Cast size" name="castSize" type="number" defaultValue={play?.castSize} />
@@ -69,7 +75,7 @@ export function PlayForm({
           name="synopsis"
           defaultValue={play?.synopsis ?? ""}
           rows={4}
-          className="border border-black/15 dark:border-white/20 rounded px-2 py-1.5 bg-transparent text-sm"
+          className={fieldClass}
         />
       </label>
 
@@ -85,7 +91,7 @@ export function PlayForm({
       <div>
         <button
           type="submit"
-          className="rounded bg-foreground text-background px-4 py-2 text-sm font-medium"
+          className="rounded-md bg-accent text-accent-foreground px-4 py-2 text-sm font-medium transition-opacity hover:opacity-90"
         >
           {submitLabel}
         </button>

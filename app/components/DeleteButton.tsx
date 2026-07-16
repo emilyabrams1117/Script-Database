@@ -18,7 +18,7 @@ export function DeleteButton({
     >
       <button
         type="submit"
-        className="text-xs rounded border border-red-500/40 text-red-600 dark:text-red-400 px-2 py-1 hover:bg-red-500/10"
+        className="text-xs rounded-md border border-red-500/40 text-red-600 dark:text-red-400 px-2.5 py-1.5 transition-colors hover:bg-red-500/10"
       >
         {label}
       </button>

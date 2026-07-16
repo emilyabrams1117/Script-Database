@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
+import { Geist, Geist_Mono, Lora } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -9,6 +10,11 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const lora = Lora({
+  variable: "--font-display",
   subsets: ["latin"],
 });
 
@@ -25,30 +31,27 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <header className="border-b border-black/10 dark:border-white/10">
           <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
-            <a href="/plays" className="text-lg font-semibold tracking-tight">
+            <Link href="/plays" className="font-serif text-xl italic tracking-tight">
               Script Database
-            </a>
-            <nav className="text-sm flex gap-4 text-black/60 dark:text-white/60">
-              <a href="/plays" className="hover:text-black dark:hover:text-white">
+            </Link>
+            <nav className="text-sm flex gap-5 text-black/60 dark:text-white/60">
+              <Link href="/plays" className="transition-colors hover:text-accent">
                 Browse
-              </a>
-              <a
-                href="/plays?favorite=1"
-                className="hover:text-black dark:hover:text-white"
-              >
+              </Link>
+              <Link href="/plays?favorite=1" className="transition-colors hover:text-accent">
                 Favorites
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/plays/new"
-                className="hover:text-black dark:hover:text-white"
+                className="rounded-full bg-accent px-3 py-1 text-accent-foreground transition-opacity hover:opacity-90"
               >
                 Add a play
-              </a>
+              </Link>
             </nav>
           </div>
         </header>

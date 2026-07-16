@@ -25,6 +25,7 @@ model Play {
   flexibleCount Int?
   genre         String?
   runtime       String?
+  year          Int? // copyright/publication year, as printed on the script
   synopsis      String?
   extractedText String? // full PDF text, used for keyword search
   themes        String[] @default([]) // short keyword/theme tags, used for filtering + search

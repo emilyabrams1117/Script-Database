@@ -6,19 +6,23 @@ function Toggle({
   label,
   active,
   action,
+  accent = false,
 }: {
   label: string;
   active: boolean;
   action: () => Promise<void>;
+  accent?: boolean;
 }) {
   return (
     <form action={action}>
       <button
         type="submit"
-        className={`text-xs rounded-full px-2 py-0.5 border ${
+        className={`text-xs rounded-full px-2 py-0.5 border transition-colors ${
           active
-            ? "bg-foreground text-background border-foreground"
-            : "border-black/20 dark:border-white/25 text-black/60 dark:text-white/60"
+            ? accent
+              ? "bg-accent text-accent-foreground border-accent"
+              : "bg-foreground text-background border-foreground"
+            : "border-black/20 dark:border-white/25 text-black/60 dark:text-white/60 hover:border-black/40 dark:hover:border-white/40"
         }`}
       >
         {label}
@@ -29,14 +33,17 @@ function Toggle({
 
 export function PlayCard({ play }: { play: Play }) {
   return (
-    <div className="border border-black/10 dark:border-white/10 rounded-lg p-4 flex flex-col gap-2">
+    <div className="group border border-black/10 dark:border-white/10 rounded-xl p-5 flex flex-col gap-2 transition-all hover:border-accent/40 hover:shadow-sm">
       <div className="flex items-start justify-between gap-2">
-        <Link href={`/plays/${play.id}`} className="font-medium hover:underline">
+        <Link
+          href={`/plays/${play.id}`}
+          className="font-serif text-lg leading-snug group-hover:text-accent transition-colors"
+        >
           {play.title}
         </Link>
         {!play.driveFileId && (
-          <span className="text-[10px] uppercase tracking-wide text-amber-600 dark:text-amber-400 shrink-0">
-            No PDF linked
+          <span className="text-[10px] uppercase tracking-wide rounded-full px-2 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 shrink-0">
+            No PDF
           </span>
         )}
       </div>
@@ -44,6 +51,7 @@ export function PlayCard({ play }: { play: Play }) {
       <div className="text-xs text-black/50 dark:text-white/50 flex flex-wrap gap-x-3">
         {play.type && <span>{play.type}</span>}
         {play.genre && <span>{play.genre}</span>}
+        {play.year != null && <span>{play.year}</span>}
         {play.castSize != null && <span>Cast: {play.castSize}</span>}
       </div>
       {play.synopsis && (
@@ -54,7 +62,7 @@ export function PlayCard({ play }: { play: Play }) {
           {play.themes.map((theme) => (
             <span
               key={theme}
-              className="text-[10px] rounded-full px-2 py-0.5 bg-black/5 dark:bg-white/10 text-black/60 dark:text-white/60"
+              className="text-[10px] rounded-full px-2 py-0.5 bg-accent/10 text-accent"
             >
               {theme}
             </span>
@@ -68,6 +76,7 @@ export function PlayCard({ play }: { play: Play }) {
           label="★ Favorite"
           active={play.favorite}
           action={toggleFavorite.bind(null, play.id)}
+          accent
         />
       </div>
     </div>

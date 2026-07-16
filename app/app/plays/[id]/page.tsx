@@ -10,19 +10,23 @@ function ToggleButton({
   label,
   active,
   action,
+  accent = false,
 }: {
   label: string;
   active: boolean;
   action: () => Promise<void>;
+  accent?: boolean;
 }) {
   return (
     <form action={action}>
       <button
         type="submit"
-        className={`rounded-full px-3 py-1 text-sm border ${
+        className={`rounded-full px-3 py-1 text-sm border transition-colors ${
           active
-            ? "bg-foreground text-background border-foreground"
-            : "border-black/20 dark:border-white/25"
+            ? accent
+              ? "bg-accent text-accent-foreground border-accent"
+              : "bg-foreground text-background border-foreground"
+            : "border-black/20 dark:border-white/25 hover:border-black/40 dark:hover:border-white/40"
         }`}
       >
         {active ? "✓ " : ""}
@@ -38,10 +42,13 @@ function Stat({ label, value }: { label: string; value: string }) {
       <dt className="text-xs uppercase tracking-wide text-black/50 dark:text-white/50">
         {label}
       </dt>
-      <dd className="text-sm">{value}</dd>
+      <dd className="text-sm mt-0.5">{value}</dd>
     </div>
   );
 }
+
+const secondaryButtonClass =
+  "text-xs rounded-md border border-black/15 dark:border-white/20 px-2.5 py-1.5 transition-colors hover:bg-black/5 dark:hover:bg-white/10";
 
 export default async function PlayDetailPage({
   params,
@@ -61,22 +68,16 @@ export default async function PlayDetailPage({
     <div className="mx-auto max-w-5xl px-4 py-8 grid gap-8 md:grid-cols-[1fr_1.2fr]">
       <div>
         <div className="flex items-start justify-between gap-2">
-          <h1 className="text-2xl font-semibold mb-1">{play.title}</h1>
+          <h1 className="font-serif text-3xl italic leading-tight mb-1">{play.title}</h1>
           <div className="flex gap-2 shrink-0">
             {play.driveFileId && (
               <form action={reextractPlay.bind(null, play.id)}>
-                <button
-                  type="submit"
-                  className="text-xs rounded border border-black/15 dark:border-white/20 px-2 py-1 hover:bg-black/5 dark:hover:bg-white/10"
-                >
+                <button type="submit" className={secondaryButtonClass}>
                   Re-extract from PDF
                 </button>
               </form>
             )}
-            <Link
-              href={`/plays/${play.id}/edit`}
-              className="text-xs rounded border border-black/15 dark:border-white/20 px-2 py-1 hover:bg-black/5 dark:hover:bg-white/10"
-            >
+            <Link href={`/plays/${play.id}/edit`} className={secondaryButtonClass}>
               Edit
             </Link>
           </div>
@@ -90,25 +91,24 @@ export default async function PlayDetailPage({
             label="★ Favorite"
             active={play.favorite}
             action={toggleFavorite.bind(null, play.id)}
+            accent
           />
         </div>
 
-        <dl className="grid grid-cols-2 gap-4 mb-6">
+        <dl className="grid grid-cols-2 gap-4 mb-6 border-t border-black/10 dark:border-white/10 pt-4">
           {play.type && <Stat label="Format" value={play.type} />}
           {play.publication && <Stat label="Publication" value={play.publication} />}
           {play.genre && <Stat label="Genre" value={play.genre} />}
+          {play.year != null && <Stat label="Year" value={String(play.year)} />}
           {play.runtime && <Stat label="Runtime" value={play.runtime} />}
           {play.castSize != null && <Stat label="Cast size" value={String(play.castSize)} />}
           {genderParts.length > 0 && <Stat label="Gender breakdown" value={genderParts.join(", ")} />}
         </dl>
 
         {play.themes.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-4">
+          <div className="flex flex-wrap gap-1 mb-5">
             {play.themes.map((theme) => (
-              <span
-                key={theme}
-                className="text-xs rounded-full px-2 py-0.5 bg-black/5 dark:bg-white/10 text-black/60 dark:text-white/60"
-              >
+              <span key={theme} className="text-xs rounded-full px-2 py-0.5 bg-accent/10 text-accent">
                 {theme}
               </span>
             ))}

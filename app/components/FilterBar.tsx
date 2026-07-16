@@ -1,4 +1,8 @@
+import Link from "next/link";
 import type { PlaySearchParams } from "@/lib/queries";
+
+const fieldClass =
+  "border border-black/15 dark:border-white/20 rounded-md px-2 py-1.5 bg-transparent text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent";
 
 export function FilterBar({
   params,
@@ -14,7 +18,7 @@ export function FilterBar({
   return (
     <form
       method="get"
-      className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6 items-end mb-6"
+      className="rounded-xl border border-black/10 dark:border-white/10 bg-black/[0.02] dark:bg-white/[0.03] p-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6 items-end mb-6"
     >
       <label className="flex flex-col gap-1 col-span-2 md:col-span-2">
         <span className="text-xs text-black/60 dark:text-white/60">Search</span>
@@ -23,27 +27,18 @@ export function FilterBar({
           name="q"
           defaultValue={params.q ?? ""}
           placeholder="title, author, synopsis..."
-          className="border border-black/15 dark:border-white/20 rounded px-2 py-1.5 bg-transparent text-sm"
+          className={fieldClass}
         />
       </label>
 
       <label className="flex flex-col gap-1">
         <span className="text-xs text-black/60 dark:text-white/60">Author last name</span>
-        <input
-          type="text"
-          name="author"
-          defaultValue={params.author ?? ""}
-          className="border border-black/15 dark:border-white/20 rounded px-2 py-1.5 bg-transparent text-sm"
-        />
+        <input type="text" name="author" defaultValue={params.author ?? ""} className={fieldClass} />
       </label>
 
       <label className="flex flex-col gap-1">
         <span className="text-xs text-black/60 dark:text-white/60">Genre</span>
-        <select
-          name="genre"
-          defaultValue={params.genre ?? ""}
-          className="border border-black/15 dark:border-white/20 rounded px-2 py-1.5 bg-transparent text-sm"
-        >
+        <select name="genre" defaultValue={params.genre ?? ""} className={fieldClass}>
           <option value="">Any</option>
           {genres.map((g) => (
             <option key={g} value={g}>
@@ -55,11 +50,7 @@ export function FilterBar({
 
       <label className="flex flex-col gap-1">
         <span className="text-xs text-black/60 dark:text-white/60">Theme</span>
-        <select
-          name="theme"
-          defaultValue={params.theme ?? ""}
-          className="border border-black/15 dark:border-white/20 rounded px-2 py-1.5 bg-transparent text-sm"
-        >
+        <select name="theme" defaultValue={params.theme ?? ""} className={fieldClass}>
           <option value="">Any</option>
           {themes.map((t) => (
             <option key={t} value={t}>
@@ -71,11 +62,7 @@ export function FilterBar({
 
       <label className="flex flex-col gap-1">
         <span className="text-xs text-black/60 dark:text-white/60">Type</span>
-        <select
-          name="type"
-          defaultValue={params.type ?? ""}
-          className="border border-black/15 dark:border-white/20 rounded px-2 py-1.5 bg-transparent text-sm"
-        >
+        <select name="type" defaultValue={params.type ?? ""} className={fieldClass}>
           <option value="">Any</option>
           {types.map((t) => (
             <option key={t} value={t}>
@@ -87,11 +74,7 @@ export function FilterBar({
 
       <label className="flex flex-col gap-1">
         <span className="text-xs text-black/60 dark:text-white/60">Sort by</span>
-        <select
-          name="sort"
-          defaultValue={params.sort ?? "title"}
-          className="border border-black/15 dark:border-white/20 rounded px-2 py-1.5 bg-transparent text-sm"
-        >
+        <select name="sort" defaultValue={params.sort ?? "title"} className={fieldClass}>
           <option value="title">Title</option>
           <option value="author">Author</option>
           <option value="recent">Recently added</option>
@@ -105,7 +88,7 @@ export function FilterBar({
           min={0}
           name="minMale"
           defaultValue={params.minMale ?? ""}
-          className="border border-black/15 dark:border-white/20 rounded px-2 py-1.5 bg-transparent text-sm"
+          className={fieldClass}
         />
       </label>
 
@@ -116,27 +99,17 @@ export function FilterBar({
           min={0}
           name="minFemale"
           defaultValue={params.minFemale ?? ""}
-          className="border border-black/15 dark:border-white/20 rounded px-2 py-1.5 bg-transparent text-sm"
+          className={fieldClass}
         />
       </label>
 
-      <div className="flex gap-3 items-center col-span-2 md:col-span-2">
+      <div className="flex flex-wrap gap-3 items-center col-span-2 md:col-span-2">
         <label className="flex items-center gap-1.5 text-sm">
-          <input
-            type="checkbox"
-            name="read"
-            value="1"
-            defaultChecked={params.read === "1"}
-          />
+          <input type="checkbox" name="read" value="1" defaultChecked={params.read === "1"} className="accent-accent" />
           Read
         </label>
         <label className="flex items-center gap-1.5 text-sm">
-          <input
-            type="checkbox"
-            name="seen"
-            value="1"
-            defaultChecked={params.seen === "1"}
-          />
+          <input type="checkbox" name="seen" value="1" defaultChecked={params.seen === "1"} className="accent-accent" />
           Seen
         </label>
         <label className="flex items-center gap-1.5 text-sm">
@@ -145,6 +118,7 @@ export function FilterBar({
             name="favorite"
             value="1"
             defaultChecked={params.favorite === "1"}
+            className="accent-accent"
           />
           Favorite
         </label>
@@ -154,6 +128,7 @@ export function FilterBar({
             name="missingLink"
             value="1"
             defaultChecked={params.missingLink === "1"}
+            className="accent-accent"
           />
           Missing PDF link
         </label>
@@ -162,16 +137,16 @@ export function FilterBar({
       <div className="flex gap-2">
         <button
           type="submit"
-          className="rounded bg-foreground text-background px-3 py-1.5 text-sm font-medium"
+          className="rounded-md bg-accent text-accent-foreground px-3 py-1.5 text-sm font-medium transition-opacity hover:opacity-90"
         >
           Apply
         </button>
-        <a
+        <Link
           href="/plays"
-          className="rounded border border-black/15 dark:border-white/20 px-3 py-1.5 text-sm"
+          className="rounded-md border border-black/15 dark:border-white/20 px-3 py-1.5 text-sm transition-colors hover:bg-black/5 dark:hover:bg-white/10"
         >
           Reset
-        </a>
+        </Link>
       </div>
     </form>
   );

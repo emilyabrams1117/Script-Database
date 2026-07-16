@@ -1,6 +1,15 @@
 import { GoogleAuth } from "google-auth-library";
 import Anthropic from "@anthropic-ai/sdk";
-import { PDFParse } from "pdf-parse";
+
+// pdf-parse's Node build still resolves through pdfjs-dist code paths that
+// reference the browser-only DOMMatrix global, which crashes at import time
+// in some serverless runtimes. Polyfill it before pdf-parse loads.
+if (typeof globalThis.DOMMatrix === "undefined") {
+  const { default: DOMMatrix } = await import("dommatrix");
+  globalThis.DOMMatrix = DOMMatrix;
+}
+
+const { PDFParse } = await import("pdf-parse");
 
 const MODEL = "claude-haiku-4-5";
 const MAX_CHARS = 60000; // keep cost/time bounded; cast lists + enough plot context are almost always within this
@@ -58,6 +67,11 @@ const TOOL = {
         description:
           "Estimated running time if stated in the script (e.g. '90 minutes'); otherwise a rough estimate from page/scene count, e.g. '~100 minutes (estimated)'.",
       },
+      year: {
+        type: "integer",
+        description:
+          "The copyright or publication year printed on the script (e.g. in a copyright notice or publisher's imprint), as a 4-digit year. Omit this field entirely if no such year is stated anywhere in the text.",
+      },
       synopsis: { type: "string", description: "A 2-4 sentence, spoiler-light synopsis." },
       themes: {
         type: "array",
@@ -77,6 +91,7 @@ type ExtractedMetadata = {
   flexible_count: number;
   genre: string;
   runtime?: string;
+  year?: number;
   synopsis: string;
   themes: string[];
 };

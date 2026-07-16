@@ -19,7 +19,7 @@ export default async function EditPlayPage({
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       <div className="flex items-start justify-between gap-4 mb-6">
-        <h1 className="text-2xl font-semibold">Edit &ldquo;{play.title}&rdquo;</h1>
+        <h1 className="font-serif text-2xl italic">Edit &ldquo;{play.title}&rdquo;</h1>
         <DeleteButton
           action={deletePlay.bind(null, play.id)}
           confirmMessage={`Delete "${play.title}"? This can't be undone.`}

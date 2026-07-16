@@ -16,7 +16,7 @@ export default async function PlaysPage({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="text-2xl font-semibold mb-1">Browse the collection</h1>
+      <h1 className="font-serif text-3xl italic mb-1">Browse the collection</h1>
       <p className="text-sm text-black/60 dark:text-white/60 mb-6">
         {total.toLocaleString()} plays
       </p>
@@ -24,7 +24,7 @@ export default async function PlaysPage({
       <FilterBar params={params} genres={genres} types={types} themes={themes} />
 
       {plays.length === 0 ? (
-        <p className="text-black/60 dark:text-white/60 py-12 text-center">
+        <p className="text-black/60 dark:text-white/60 py-16 text-center">
           No plays match those filters.
         </p>
       ) : (
