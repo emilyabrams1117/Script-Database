@@ -4,10 +4,12 @@ export function FilterBar({
   params,
   genres,
   types,
+  themes,
 }: {
   params: PlaySearchParams;
   genres: string[];
   types: string[];
+  themes: string[];
 }) {
   return (
     <form
@@ -46,6 +48,22 @@ export function FilterBar({
           {genres.map((g) => (
             <option key={g} value={g}>
               {g}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="flex flex-col gap-1">
+        <span className="text-xs text-black/60 dark:text-white/60">Theme</span>
+        <select
+          name="theme"
+          defaultValue={params.theme ?? ""}
+          className="border border-black/15 dark:border-white/20 rounded px-2 py-1.5 bg-transparent text-sm"
+        >
+          <option value="">Any</option>
+          {themes.map((t) => (
+            <option key={t} value={t}>
+              {t}
             </option>
           ))}
         </select>

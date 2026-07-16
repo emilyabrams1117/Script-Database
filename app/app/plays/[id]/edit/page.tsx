@@ -4,6 +4,9 @@ import { updatePlay, deletePlay } from "@/lib/actions";
 import { PlayForm } from "@/components/PlayForm";
 import { DeleteButton } from "@/components/DeleteButton";
 
+// Drive download + Claude extraction can take a few seconds.
+export const maxDuration = 60;
+
 export default async function EditPlayPage({
   params,
 }: {

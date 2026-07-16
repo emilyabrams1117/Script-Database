@@ -9,7 +9,7 @@ export default async function PlaysPage({
   searchParams: Promise<PlaySearchParams>;
 }) {
   const params = await searchParams;
-  const [{ plays, total, page, pageCount }, { genres, types }] = await Promise.all([
+  const [{ plays, total, page, pageCount }, { genres, types, themes }] = await Promise.all([
     getPlays(params),
     getFilterOptions(),
   ]);
@@ -21,7 +21,7 @@ export default async function PlaysPage({
         {total.toLocaleString()} plays
       </p>
 
-      <FilterBar params={params} genres={genres} types={types} />
+      <FilterBar params={params} genres={genres} types={types} themes={themes} />
 
       {plays.length === 0 ? (
         <p className="text-black/60 dark:text-white/60 py-12 text-center">

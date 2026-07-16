@@ -7,6 +7,7 @@ export type PlaySearchParams = {
   q?: string;
   author?: string;
   genre?: string;
+  theme?: string;
   type?: string;
   read?: string;
   seen?: string;
@@ -34,6 +35,7 @@ export function buildWhere(params: PlaySearchParams): Prisma.PlayWhereInput {
   }
   if (params.author) and.push({ authorLast: { contains: params.author } });
   if (params.genre) and.push({ genre: { contains: params.genre } });
+  if (params.theme) and.push({ themes: { has: params.theme } });
   if (params.type) and.push({ type: params.type });
   if (params.read === "1") and.push({ read: true });
   if (params.seen === "1") and.push({ seen: true });
@@ -76,7 +78,7 @@ export async function getPlays(params: PlaySearchParams) {
 }
 
 export async function getFilterOptions() {
-  const [genres, types] = await Promise.all([
+  const [genres, types, themeRows] = await Promise.all([
     prisma.play.findMany({
       where: { genre: { not: null } },
       select: { genre: true },
@@ -89,9 +91,14 @@ export async function getFilterOptions() {
       distinct: ["type"],
       orderBy: { type: "asc" },
     }),
+    // Prisma has no distinct-on-array-element helper, so unnest via raw SQL.
+    prisma.$queryRaw<{ theme: string }[]>`
+      SELECT DISTINCT unnest(themes) AS theme FROM "Play" ORDER BY theme
+    `,
   ]);
   return {
     genres: genres.map((g) => g.genre!).filter(Boolean),
     types: types.map((t) => t.type!).filter(Boolean),
+    themes: themeRows.map((t) => t.theme),
   };
 }

@@ -49,6 +49,18 @@ export function PlayCard({ play }: { play: Play }) {
       {play.synopsis && (
         <p className="text-sm text-black/70 dark:text-white/70 line-clamp-3">{play.synopsis}</p>
       )}
+      {play.themes.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {play.themes.map((theme) => (
+            <span
+              key={theme}
+              className="text-[10px] rounded-full px-2 py-0.5 bg-black/5 dark:bg-white/10 text-black/60 dark:text-white/60"
+            >
+              {theme}
+            </span>
+          ))}
+        </div>
+      )}
       <div className="flex gap-2 mt-1">
         <Toggle label="Read" active={play.read} action={toggleRead.bind(null, play.id)} />
         <Toggle label="Seen" active={play.seen} action={toggleSeen.bind(null, play.id)} />

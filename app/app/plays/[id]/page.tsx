@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { toggleRead, toggleSeen, toggleFavorite } from "@/lib/actions";
+import { toggleRead, toggleSeen, toggleFavorite, reextractPlay } from "@/lib/actions";
+
+// Drive download + Claude extraction can take a few seconds.
+export const maxDuration = 60;
 
 function ToggleButton({
   label,
@@ -59,12 +62,24 @@ export default async function PlayDetailPage({
       <div>
         <div className="flex items-start justify-between gap-2">
           <h1 className="text-2xl font-semibold mb-1">{play.title}</h1>
-          <Link
-            href={`/plays/${play.id}/edit`}
-            className="text-xs shrink-0 rounded border border-black/15 dark:border-white/20 px-2 py-1 hover:bg-black/5 dark:hover:bg-white/10"
-          >
-            Edit
-          </Link>
+          <div className="flex gap-2 shrink-0">
+            {play.driveFileId && (
+              <form action={reextractPlay.bind(null, play.id)}>
+                <button
+                  type="submit"
+                  className="text-xs rounded border border-black/15 dark:border-white/20 px-2 py-1 hover:bg-black/5 dark:hover:bg-white/10"
+                >
+                  Re-extract from PDF
+                </button>
+              </form>
+            )}
+            <Link
+              href={`/plays/${play.id}/edit`}
+              className="text-xs rounded border border-black/15 dark:border-white/20 px-2 py-1 hover:bg-black/5 dark:hover:bg-white/10"
+            >
+              Edit
+            </Link>
+          </div>
         </div>
         <p className="text-black/60 dark:text-white/60 mb-4">{play.author}</p>
 
@@ -86,6 +101,19 @@ export default async function PlayDetailPage({
           {play.castSize != null && <Stat label="Cast size" value={String(play.castSize)} />}
           {genderParts.length > 0 && <Stat label="Gender breakdown" value={genderParts.join(", ")} />}
         </dl>
+
+        {play.themes.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-4">
+            {play.themes.map((theme) => (
+              <span
+                key={theme}
+                className="text-xs rounded-full px-2 py-0.5 bg-black/5 dark:bg-white/10 text-black/60 dark:text-white/60"
+              >
+                {theme}
+              </span>
+            ))}
+          </div>
+        )}
 
         {play.synopsis ? (
           <div className="mb-6">
