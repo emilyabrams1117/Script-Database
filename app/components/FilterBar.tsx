@@ -32,7 +32,7 @@ export function FilterBar({
       </label>
 
       <label className="flex flex-col gap-1">
-        <span className="text-xs text-black/60 dark:text-white/60">Author last name</span>
+        <span className="text-xs text-black/60 dark:text-white/60">Playwright&apos;s name</span>
         <input type="text" name="author" defaultValue={params.author ?? ""} className={fieldClass} />
       </label>
 
