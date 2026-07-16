@@ -6,6 +6,7 @@ import type { PlaySearchParams } from "@/lib/queries";
 import { loadMorePlays } from "@/lib/actions";
 import { PlayCard } from "@/components/PlayCard";
 import { PlayListRow } from "@/components/PlayListRow";
+import { FILTER_FORM_ID } from "@/lib/constants";
 
 function GridIcon() {
   return (
@@ -64,16 +65,25 @@ export function PlayResults({
     });
   }
 
+  // Associated with the filter form by id (not a DOM descendant of it — this
+  // component renders separately from FilterBar), so the currently active
+  // view mode is included whenever that form is submitted.
+  const viewInput = <input type="hidden" name="view" value={view} form={FILTER_FORM_ID} />;
+
   if (plays.length === 0) {
     return (
-      <p className="text-black/60 dark:text-white/60 py-16 text-center">
-        No plays match those filters.
-      </p>
+      <>
+        {viewInput}
+        <p className="text-black/60 dark:text-white/60 py-16 text-center">
+          No plays match those filters.
+        </p>
+      </>
     );
   }
 
   return (
     <>
+      {viewInput}
       <div className="flex justify-end mb-3">
         <div className="inline-flex rounded-md border border-black/15 dark:border-white/20 p-0.5">
           <button

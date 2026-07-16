@@ -1,5 +1,7 @@
 import Link from "next/link";
-import type { PlaySearchParams } from "@/lib/queries";
+import { toArray, type PlaySearchParams } from "@/lib/queries";
+import { MultiSelectFilter } from "@/components/MultiSelectFilter";
+import { FILTER_FORM_ID } from "@/lib/constants";
 
 const fieldClass =
   "border border-black/15 dark:border-white/20 rounded-md px-2 py-1.5 bg-transparent text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent";
@@ -17,6 +19,7 @@ export function FilterBar({
 }) {
   return (
     <form
+      id={FILTER_FORM_ID}
       method="get"
       className="rounded-xl border border-black/10 dark:border-white/10 bg-black/[0.02] dark:bg-white/[0.03] p-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6 items-end mb-6"
     >
@@ -36,41 +39,11 @@ export function FilterBar({
         <input type="text" name="author" defaultValue={params.author ?? ""} className={fieldClass} />
       </label>
 
-      <label className="flex flex-col gap-1">
-        <span className="text-xs text-black/60 dark:text-white/60">Genre</span>
-        <select name="genre" defaultValue={params.genre ?? ""} className={fieldClass}>
-          <option value="">Any</option>
-          {genres.map((g) => (
-            <option key={g} value={g}>
-              {g}
-            </option>
-          ))}
-        </select>
-      </label>
+      <MultiSelectFilter name="genre" label="Genre" options={genres} selected={toArray(params.genre)} />
 
-      <label className="flex flex-col gap-1">
-        <span className="text-xs text-black/60 dark:text-white/60">Theme</span>
-        <select name="theme" defaultValue={params.theme ?? ""} className={fieldClass}>
-          <option value="">Any</option>
-          {themes.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
-      </label>
+      <MultiSelectFilter name="theme" label="Theme" options={themes} selected={toArray(params.theme)} />
 
-      <label className="flex flex-col gap-1">
-        <span className="text-xs text-black/60 dark:text-white/60">Type</span>
-        <select name="type" defaultValue={params.type ?? ""} className={fieldClass}>
-          <option value="">Any</option>
-          {types.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
-      </label>
+      <MultiSelectFilter name="type" label="Type" options={types} selected={toArray(params.type)} />
 
       <label className="flex flex-col gap-1">
         <span className="text-xs text-black/60 dark:text-white/60">Sort by</span>

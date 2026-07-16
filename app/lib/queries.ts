@@ -6,9 +6,9 @@ export const PAGE_SIZE = 30;
 export type PlaySearchParams = {
   q?: string;
   author?: string;
-  genre?: string;
-  theme?: string;
-  type?: string;
+  genre?: string | string[];
+  theme?: string | string[];
+  type?: string | string[];
   read?: string;
   seen?: string;
   favorite?: string;
@@ -19,6 +19,13 @@ export type PlaySearchParams = {
   page?: string;
   view?: string;
 };
+
+// Next.js collapses a repeated query key (?genre=A&genre=B) to a string[],
+// but a single occurrence stays a plain string — normalize both to an array.
+export function toArray(value: string | string[] | undefined): string[] {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
+}
 
 export function buildWhere(params: PlaySearchParams): Prisma.PlayWhereInput {
   const where: Prisma.PlayWhereInput = {};
@@ -35,9 +42,12 @@ export function buildWhere(params: PlaySearchParams): Prisma.PlayWhereInput {
     });
   }
   if (params.author) and.push({ authorLast: { contains: params.author } });
-  if (params.genre) and.push({ genre: { contains: params.genre } });
-  if (params.theme) and.push({ themes: { has: params.theme } });
-  if (params.type) and.push({ type: params.type });
+  const genres = toArray(params.genre);
+  if (genres.length) and.push({ genre: { in: genres } });
+  const themes = toArray(params.theme);
+  if (themes.length) and.push({ themes: { hasSome: themes } });
+  const types = toArray(params.type);
+  if (types.length) and.push({ type: { in: types } });
   if (params.read === "1") and.push({ read: true });
   if (params.seen === "1") and.push({ seen: true });
   if (params.favorite === "1") and.push({ favorite: true });

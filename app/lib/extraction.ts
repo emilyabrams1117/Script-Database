@@ -132,14 +132,21 @@ async function extractMetadata(
   if (!toolUse || toolUse.type !== "tool_use") throw new Error("No tool_use in response");
   const data = toolUse.input as ExtractedMetadata;
   const isFiniteNumber = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v);
+  // The model occasionally returns a literal placeholder like "<UNKNOWN>"
+  // instead of a real value for fields it can't determine — a valid string,
+  // so the type checks alone don't catch it.
+  const isPlaceholder = (v: string) => /unknown/i.test(v);
   if (
     !isFiniteNumber(data.cast_size) ||
     !isFiniteNumber(data.male_count) ||
     !isFiniteNumber(data.female_count) ||
     !isFiniteNumber(data.flexible_count) ||
     typeof data.genre !== "string" ||
+    isPlaceholder(data.genre) ||
     typeof data.synopsis !== "string" ||
-    !Array.isArray(data.themes)
+    isPlaceholder(data.synopsis) ||
+    !Array.isArray(data.themes) ||
+    data.themes.some((t) => typeof t !== "string" || isPlaceholder(t))
   ) {
     throw new Error(`Model returned malformed metadata: ${JSON.stringify(data)}`);
   }
