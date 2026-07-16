@@ -6,6 +6,45 @@ import { FILTER_FORM_ID } from "@/lib/constants";
 const fieldClass =
   "border border-black/15 dark:border-white/20 rounded-md px-2 py-1.5 bg-transparent text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent";
 
+function RangeField({
+  label,
+  minName,
+  maxName,
+  minValue,
+  maxValue,
+}: {
+  label: string;
+  minName: string;
+  maxName: string;
+  minValue?: string;
+  maxValue?: string;
+}) {
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="text-xs text-black/60 dark:text-white/60">{label}</span>
+      <div className="flex items-center gap-1">
+        <input
+          type="number"
+          min={0}
+          name={minName}
+          defaultValue={minValue ?? ""}
+          placeholder="Min"
+          className={`${fieldClass} w-0 flex-1 min-w-0`}
+        />
+        <span className="text-black/40 dark:text-white/40 text-xs">–</span>
+        <input
+          type="number"
+          min={0}
+          name={maxName}
+          defaultValue={maxValue ?? ""}
+          placeholder="Max"
+          className={`${fieldClass} w-0 flex-1 min-w-0`}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function FilterBar({
   params,
   genres,
@@ -54,27 +93,29 @@ export function FilterBar({
         </select>
       </label>
 
-      <label className="flex flex-col gap-1">
-        <span className="text-xs text-black/60 dark:text-white/60">Min. male roles</span>
-        <input
-          type="number"
-          min={0}
-          name="minMale"
-          defaultValue={params.minMale ?? ""}
-          className={fieldClass}
-        />
-      </label>
+      <RangeField
+        label="Cast size"
+        minName="minCast"
+        maxName="maxCast"
+        minValue={params.minCast}
+        maxValue={params.maxCast}
+      />
 
-      <label className="flex flex-col gap-1">
-        <span className="text-xs text-black/60 dark:text-white/60">Min. female roles</span>
-        <input
-          type="number"
-          min={0}
-          name="minFemale"
-          defaultValue={params.minFemale ?? ""}
-          className={fieldClass}
-        />
-      </label>
+      <RangeField
+        label="Male roles"
+        minName="minMale"
+        maxName="maxMale"
+        minValue={params.minMale}
+        maxValue={params.maxMale}
+      />
+
+      <RangeField
+        label="Female roles"
+        minName="minFemale"
+        maxName="maxFemale"
+        minValue={params.minFemale}
+        maxValue={params.maxFemale}
+      />
 
       <div className="flex flex-wrap gap-3 items-center col-span-2 md:col-span-2">
         <label className="flex items-center gap-1.5 text-sm">

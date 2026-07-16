@@ -13,8 +13,12 @@ export type PlaySearchParams = {
   seen?: string;
   favorite?: string;
   missingLink?: string;
+  minCast?: string;
+  maxCast?: string;
   minMale?: string;
+  maxMale?: string;
   minFemale?: string;
+  maxFemale?: string;
   sort?: string;
   page?: string;
   view?: string;
@@ -52,8 +56,12 @@ export function buildWhere(params: PlaySearchParams): Prisma.PlayWhereInput {
   if (params.seen === "1") and.push({ seen: true });
   if (params.favorite === "1") and.push({ favorite: true });
   if (params.missingLink === "1") and.push({ driveFileId: null });
+  if (params.minCast) and.push({ castSize: { gte: Number(params.minCast) } });
+  if (params.maxCast) and.push({ castSize: { lte: Number(params.maxCast) } });
   if (params.minMale) and.push({ maleCount: { gte: Number(params.minMale) } });
+  if (params.maxMale) and.push({ maleCount: { lte: Number(params.maxMale) } });
   if (params.minFemale) and.push({ femaleCount: { gte: Number(params.minFemale) } });
+  if (params.maxFemale) and.push({ femaleCount: { lte: Number(params.maxFemale) } });
 
   if (and.length) where.AND = and;
   return where;
