@@ -1,35 +1,7 @@
 import Link from "next/link";
 import type { Play } from "@/app/generated/prisma/client";
 import { toggleRead, toggleSeen, toggleFavorite } from "@/lib/actions";
-
-function Toggle({
-  label,
-  active,
-  action,
-  accent = false,
-}: {
-  label: string;
-  active: boolean;
-  action: () => Promise<void>;
-  accent?: boolean;
-}) {
-  return (
-    <form action={action}>
-      <button
-        type="submit"
-        className={`text-xs rounded-full px-2 py-0.5 border transition-colors ${
-          active
-            ? accent
-              ? "bg-accent text-accent-foreground border-accent"
-              : "bg-foreground text-background border-foreground"
-            : "border-black/20 dark:border-white/25 text-black/60 dark:text-white/60 hover:border-black/40 dark:hover:border-white/40"
-        }`}
-      >
-        {label}
-      </button>
-    </form>
-  );
-}
+import { PlayToggle } from "@/components/PlayToggle";
 
 export function PlayCard({ play }: { play: Play }) {
   return (
@@ -70,9 +42,9 @@ export function PlayCard({ play }: { play: Play }) {
         </div>
       )}
       <div className="flex gap-2 mt-1">
-        <Toggle label="Read" active={play.read} action={toggleRead.bind(null, play.id)} />
-        <Toggle label="Seen" active={play.seen} action={toggleSeen.bind(null, play.id)} />
-        <Toggle
+        <PlayToggle label="Read" active={play.read} action={toggleRead.bind(null, play.id)} />
+        <PlayToggle label="Seen" active={play.seen} action={toggleSeen.bind(null, play.id)} />
+        <PlayToggle
           label="★ Favorite"
           active={play.favorite}
           action={toggleFavorite.bind(null, play.id)}

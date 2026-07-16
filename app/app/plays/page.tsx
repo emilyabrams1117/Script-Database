@@ -1,7 +1,6 @@
 import { getPlays, getFilterOptions, type PlaySearchParams } from "@/lib/queries";
 import { FilterBar } from "@/components/FilterBar";
-import { PlayCard } from "@/components/PlayCard";
-import { Pagination } from "@/components/Pagination";
+import { PlayResults } from "@/components/PlayResults";
 
 export default async function PlaysPage({
   searchParams,
@@ -14,6 +13,13 @@ export default async function PlaysPage({
     getFilterOptions(),
   ]);
 
+  // Only the filters (not view/page) should reset the loaded-results state
+  // on navigation — view toggling and "Load more" are handled client-side.
+  const filterParams: PlaySearchParams = { ...params };
+  delete filterParams.view;
+  delete filterParams.page;
+  const filterKey = JSON.stringify(filterParams);
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       <h1 className="font-serif text-3xl italic mb-1">Browse the collection</h1>
@@ -23,19 +29,14 @@ export default async function PlaysPage({
 
       <FilterBar params={params} genres={genres} types={types} themes={themes} />
 
-      {plays.length === 0 ? (
-        <p className="text-black/60 dark:text-white/60 py-16 text-center">
-          No plays match those filters.
-        </p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {plays.map((play) => (
-            <PlayCard key={play.id} play={play} />
-          ))}
-        </div>
-      )}
-
-      <Pagination params={params} page={page} pageCount={pageCount} />
+      <PlayResults
+        key={filterKey}
+        initialPlays={plays}
+        initialPage={page}
+        initialPageCount={pageCount}
+        initialView={params.view === "list" ? "list" : "grid"}
+        params={params}
+      />
     </div>
   );
 }

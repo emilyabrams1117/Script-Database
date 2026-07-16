@@ -17,6 +17,7 @@ export type PlaySearchParams = {
   minFemale?: string;
   sort?: string;
   page?: string;
+  view?: string;
 };
 
 export function buildWhere(params: PlaySearchParams): Prisma.PlayWhereInput {

@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { normalizeTitle, extractDriveFileId } from "@/lib/normalize";
 import { runExtraction } from "@/lib/extraction";
+import { getPlays, type PlaySearchParams } from "@/lib/queries";
 import type { Play } from "@/app/generated/prisma/client";
 
 function str(formData: FormData, key: string): string | null {
@@ -172,4 +173,12 @@ export async function deletePlay(id: string) {
   await prisma.play.delete({ where: { id } });
   revalidatePath("/plays");
   redirect("/plays");
+}
+
+// Fetches one more page of results for the "Load more" button on /plays —
+// a Server Action so the client results list can request additional plays
+// without a full page navigation.
+export async function loadMorePlays(params: PlaySearchParams, page: number) {
+  const { plays, pageCount } = await getPlays({ ...params, page: String(page) });
+  return { plays, pageCount };
 }
