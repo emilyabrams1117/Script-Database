@@ -38,6 +38,10 @@ function estCost(inputTokens: number, outputTokens: number) {
   return (inputTokens / 1e6) * 1 + (outputTokens / 1e6) * 5;
 }
 
+function isLowBalance(msg: string) {
+  return /credit balance is too low/i.test(msg);
+}
+
 async function withRetry<T>(fn: () => Promise<T>, label: string): Promise<T> {
   let lastErr: unknown;
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
@@ -45,9 +49,12 @@ async function withRetry<T>(fn: () => Promise<T>, label: string): Promise<T> {
       return await fn();
     } catch (err) {
       lastErr = err;
+      const message = err instanceof Error ? err.message : String(err);
+      // No point retrying — the account is out of credits, not a transient blip.
+      if (isLowBalance(message)) throw err;
       if (attempt < MAX_RETRIES) {
         const delay = 2000 * 2 ** attempt;
-        log(`  retrying ${label} after error (attempt ${attempt + 1}/${MAX_RETRIES}): ${err instanceof Error ? err.message : err} — waiting ${delay}ms`);
+        log(`  retrying ${label} after error (attempt ${attempt + 1}/${MAX_RETRIES}): ${message} — waiting ${delay}ms`);
         await new Promise((r) => setTimeout(r, delay));
       }
     }
@@ -73,8 +80,10 @@ async function main() {
   let totalOutputTokens = 0;
 
   let idx = 0;
+  let halted = false;
   async function worker() {
     while (true) {
+      if (halted) return;
       const i = idx++;
       if (i >= candidates.length) return;
       const play = candidates[i];
@@ -84,8 +93,15 @@ async function main() {
           play.title
         );
         if (!result.ok) {
-          if (result.reason === "no_text") noText++;
-          else errored++;
+          if (result.reason === "no_text") {
+            noText++;
+          } else {
+            errored++;
+            if (isLowBalance(result.reason) && !halted) {
+              halted = true;
+              log(`HALTING: Anthropic account is out of credits. Add funds and re-run — already-completed plays won't be reprocessed.`);
+            }
+          }
           log(`[${i + 1}/${candidates.length}] SKIP "${play.title}": ${result.reason}`);
         } else {
           await prisma.play.update({
