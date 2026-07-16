@@ -26,7 +26,7 @@ export function FilterBar({
           type="text"
           name="q"
           defaultValue={params.q ?? ""}
-          placeholder="title, author, synopsis..."
+          placeholder="title, playwright, synopsis..."
           className={fieldClass}
         />
       </label>
@@ -76,7 +76,7 @@ export function FilterBar({
         <span className="text-xs text-black/60 dark:text-white/60">Sort by</span>
         <select name="sort" defaultValue={params.sort ?? "title"} className={fieldClass}>
           <option value="title">Title</option>
-          <option value="author">Author</option>
+          <option value="author">Playwright</option>
           <option value="recent">Recently added</option>
         </select>
       </label>

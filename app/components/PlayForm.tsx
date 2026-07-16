@@ -44,10 +44,10 @@ export function PlayForm({
     <form action={action} className="flex flex-col gap-4 max-w-xl">
       <div className="grid grid-cols-2 gap-4">
         <Field label="Title *" name="title" defaultValue={play?.title} />
-        <Field label="Author *" name="author" defaultValue={play?.author} />
+        <Field label="Playwright *" name="author" defaultValue={play?.author} />
       </div>
       <div className="grid grid-cols-2 gap-4">
-        <Field label="Author last name" name="authorLast" defaultValue={play?.authorLast} />
+        <Field label="Playwright's last name" name="authorLast" defaultValue={play?.authorLast} />
         <Field label="Type (PDF / Print / Print + PDF)" name="type" defaultValue={play?.type} />
       </div>
       <Field label="Publication" name="publication" defaultValue={play?.publication} />
