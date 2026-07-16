@@ -3,13 +3,22 @@ import Anthropic from "@anthropic-ai/sdk";
 
 // pdf-parse's Node build still resolves through pdfjs-dist code paths that
 // reference the browser-only DOMMatrix global, which crashes at import time
-// in some serverless runtimes. Polyfill it before pdf-parse loads.
-if (typeof globalThis.DOMMatrix === "undefined") {
-  const { default: DOMMatrix } = await import("dommatrix");
-  globalThis.DOMMatrix = DOMMatrix;
+// in some serverless runtimes. Polyfill it lazily, only when extraction
+// actually runs — a top-level import here would mean plain page loads
+// (which never touch pdf-parse) pay for and risk this setup too.
+let pdfParseModule: Promise<typeof import("pdf-parse")> | undefined;
+async function loadPdfParse() {
+  if (!pdfParseModule) {
+    pdfParseModule = (async () => {
+      if (typeof globalThis.DOMMatrix === "undefined") {
+        const { default: DOMMatrix } = await import("dommatrix");
+        globalThis.DOMMatrix = DOMMatrix;
+      }
+      return import("pdf-parse");
+    })();
+  }
+  return pdfParseModule;
 }
-
-const { PDFParse } = await import("pdf-parse");
 
 const MODEL = "claude-haiku-4-5";
 const MAX_CHARS = 60000; // keep cost/time bounded; cast lists + enough plot context are almost always within this
@@ -30,6 +39,7 @@ async function getDriveClient() {
 }
 
 async function fetchDrivePdfText(driveFileId: string): Promise<string> {
+  const { PDFParse } = await loadPdfParse();
   const client = await getDriveClient();
   const res = await client.request<ArrayBuffer>({
     url: `https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`,
@@ -39,7 +49,9 @@ async function fetchDrivePdfText(driveFileId: string): Promise<string> {
   const parser = new PDFParse({ data: buf });
   try {
     const result = await parser.getText();
-    return result.text;
+    // Postgres text columns reject NUL bytes outright; malformed/binary-
+    // contaminated PDF text extraction occasionally produces them.
+    return result.text.replace(/\0/g, "");
   } finally {
     await parser.destroy();
   }
@@ -96,11 +108,13 @@ type ExtractedMetadata = {
   themes: string[];
 };
 
+type Usage = { inputTokens: number; outputTokens: number };
+
 async function extractMetadata(
   title: string,
   author: string,
   text: string
-): Promise<ExtractedMetadata> {
+): Promise<{ data: ExtractedMetadata; usage: Usage }> {
   const excerpt = text.slice(0, MAX_CHARS);
   const msg = await anthropic.messages.create({
     model: MODEL,
@@ -116,11 +130,27 @@ async function extractMetadata(
   });
   const toolUse = msg.content.find((c) => c.type === "tool_use");
   if (!toolUse || toolUse.type !== "tool_use") throw new Error("No tool_use in response");
-  return toolUse.input as ExtractedMetadata;
+  const data = toolUse.input as ExtractedMetadata;
+  const isFiniteNumber = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v);
+  if (
+    !isFiniteNumber(data.cast_size) ||
+    !isFiniteNumber(data.male_count) ||
+    !isFiniteNumber(data.female_count) ||
+    !isFiniteNumber(data.flexible_count) ||
+    typeof data.genre !== "string" ||
+    typeof data.synopsis !== "string" ||
+    !Array.isArray(data.themes)
+  ) {
+    throw new Error(`Model returned malformed metadata: ${JSON.stringify(data)}`);
+  }
+  return {
+    data,
+    usage: { inputTokens: msg.usage.input_tokens, outputTokens: msg.usage.output_tokens },
+  };
 }
 
 export type RunExtractionResult =
-  | { ok: true; data: ExtractedMetadata; extractedText: string }
+  | { ok: true; data: ExtractedMetadata; extractedText: string; usage: Usage }
   | { ok: false; reason: string };
 
 export async function runExtraction({
@@ -134,11 +164,16 @@ export async function runExtraction({
 }): Promise<RunExtractionResult> {
   try {
     const text = await fetchDrivePdfText(driveFileId);
-    if (!text || text.trim().length < 200) {
+    // A scanned/image-only PDF with no text layer still yields non-empty
+    // output from pdf-parse (its own page-separator boilerplate, e.g.
+    // "-- 1 of 29 --"), so raw length alone doesn't catch it. Require a
+    // minimum amount of actual alphabetic content instead.
+    const letterCount = (text.match(/[a-zA-Z]/g) ?? []).length;
+    if (letterCount < 200) {
       return { ok: false, reason: "no_text" };
     }
-    const data = await extractMetadata(title, author, text);
-    return { ok: true, data, extractedText: text };
+    const { data, usage } = await extractMetadata(title, author, text);
+    return { ok: true, data, extractedText: text, usage };
   } catch (err) {
     return { ok: false, reason: err instanceof Error ? err.message : String(err) };
   }
